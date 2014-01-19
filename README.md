@@ -18,3 +18,9 @@ Issues, bugs and feature requests are welcome: https://github.com/Z-Wave-Me/home
     $ ssh pi@192.168.1.4
     $ sudo /etc/init.d/Z-Way restart
     $ tail -f /var/log/Z-Way.log
+
+## Raspi Firmware Update 
+
+Update tool: https://github.com/Hexxeh/rpi-update. Must use the following firmware:
+
+    $ rpi-update 8234d5148aded657760e9ecd622f324d140ae891
