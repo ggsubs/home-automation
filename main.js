@@ -43,10 +43,6 @@ function in_array (array, value) {
     return -1 != array.indexOf(value);
 }
 
-// Object.prototype.hasKey = function (value) {
-//     return -1 != Object.keys(this).indexOf(value);
-// };
-
 function has_key (obj, key) {
     return -1 != Object.keys(obj).indexOf(key);
 }
@@ -63,45 +59,107 @@ function get_values (obj) {
 
 //--- Load configuration
 
-var config = loadJSON("config.json");
 
-config.libPath = "lib";
-config.classesPath = "classes";
-config.resourcesPath = "res";
+var config;
+try {
+    config = loadJSON("config.json");
+} catch (ex) {
+    console.log("Error loading config.json:", ex.message);
+}
 
-// console.log("CFG", JSON.stringify(config, null, "  "));
+if (!config) {
+    console.log("Can't read config.json or it's broken.");
+    console.log("Please, provide correct config.json (look at the config-sample.json for reference) and restart service.");
+    console.log("ZAutomation engine not started.");
+} else {
+    config.libPath = "lib";
+    config.classesPath = "classes";
+    config.resourcesPath = "res";
 
-//--- Load constants & 3d-party dependencies
+    //--- Load constants & 3d-party dependencies
 
-executeFile("constants.js");
+    executeFile("constants.js");
+    executeFile(config.libPath + "/eventemitter2.js");
 
-executeFile(config.libPath + "/eventemitter2.js");
+    //--- Load Automation subsystem classes
 
-//--- Load Automation subsystem classes
+    executeFile(config.classesPath+"/AutomationController.js");
+    executeFile(config.classesPath+"/AutomationModule.js");
+    executeFile(config.classesPath+"/VirtualDevice.js");
 
-executeFile(config.classesPath+"/AutomationController.js");
-executeFile(config.classesPath+"/AutomationModule.js");
-executeFile(config.classesPath+"/VirtualDevice.js");
+    //--- Instantiate Automation Controller
 
-//--- Instantiate Automation Controller
+    var controller = new AutomationController(config.controller, config["vdevInfo"] || {});
 
-var controller = new AutomationController(config.controller);
+    controller.on('init', function () {
+        controller.run();
+    });
 
-controller.on('init', function () {
-    controller.run();
+    controller.on('error', function (err) {
+        console.log("--- ERROR:", err.message);
+    });
+
+    controller.on('run', function () {
+        console.log('ZWay Automation Controller started');
+
+        //--- Initialize webserver
+        executeFile("webserver.js");
+    });
+
+    //--- main
+
+    controller.init();
+}
+
+
+var sceneLastActive = 0;
+var sceneCurrentActive = 0;
+
+//console.log("STRINGIFIED>>>>>>>>>>>>>:" + JSON.stringify(zway.devices[5]));
+//console.log("STRINGIFIED>>>>>>>>>>>>>:" + JSON.stringify(zway.devices[13]));
+
+// The foolowing code block assumes:
+// The Scene Controller has association with the Razberry device (#13).
+// and it is set up via the Z-Way interface, so that Device shows up under Group 1...4 in "Device Configuration"
+
+zway.devices[13].instances[0].SceneActivation.data.currentScene.bind(function() { 
+  try {
+	  sceneCurrentActive = this.value;
+	  if (sceneCurrentActive != sceneLastActive) {
+		  console.log("Handling scene change to " + sceneCurrentActive);
+	      switch(sceneCurrentActive) {
+		     case 2:
+		        zway.devices[7].SwitchBinary.Set(255);
+                zway.devices[8].SwitchBinary.Set(255);
+                zway.devices[9].SwitchBinary.Set(255);
+                zway.devices[10].SwitchMultilevel.Set(60);
+                zway.devices[11].SwitchMultilevel.Set(60);
+		     break;
+             case 3:
+                  zway.devices[10].SwitchMultilevel.Set(100);
+                  zway.devices[11].SwitchMultilevel.Set(60);
+             break;
+		     case 5:
+		        zway.devices[7].SwitchBinary.Set(0);
+                zway.devices[8].SwitchBinary.Set(0);
+                zway.devices[9].SwitchBinary.Set(0);
+                zway.devices[10].SwitchMultilevel.Set(0);
+                zway.devices[11].SwitchMultilevel.Set(0);
+             break;
+             case 6:
+                 setTimeout(function() {
+                     zway.devices[10].SwitchMultilevel.Set(0);
+                     zway.devices[11].SwitchMultilevel.Set(0);
+                 }, 2*60*1000);
+
+             break;
+	      }
+      }
+      sceneLastActive = sceneCurrentActive;
+  } catch (ex) {
+	  console.log("Exception in scene activation callback: " + ex.message);
+  } 
 });
 
-controller.on('error', function (err) {
-    console.log("--- ERROR:", err.message);
-});
 
-controller.on('run', function () {
-    console.log('ZWay Automation Controller started');
-
-    //--- Initialize webserver
-    executeFile("webserver.js");
-});
-
-//--- main
-
-controller.init();
+console.log(">>>>>>>>>>>>>>>>>>>End of main.js");
