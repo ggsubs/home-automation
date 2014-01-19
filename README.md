@@ -10,3 +10,11 @@ Issues, bugs and feature requests are welcome: https://github.com/Z-Wave-Me/home
 
     $ cd /path/to/automationFolder
     $ nunjucks-precompile ./templates/ > ./htdocs/js/_templates.js
+
+
+## Deployement
+
+    $ scp main.js pi@192.168.1.4:/opt/z-way-server/automation/main.js
+    $ ssh pi@192.168.1.4
+    $ sudo /etc/init.d/Z-Way restart
+    $ tail -f /var/log/Z-Way.log
