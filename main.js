@@ -128,30 +128,47 @@ zway.devices[13].instances[0].SceneActivation.data.currentScene.bind(function() 
 	  if (sceneCurrentActive != sceneLastActive) {
 		  console.log("Handling scene change to " + sceneCurrentActive);
 	      switch(sceneCurrentActive) {
-		     case 2:
+			  
+			 //Leviton Scene Controller 1st Left
+			 case 2:
 		        zway.devices[7].SwitchBinary.Set(255);
                 zway.devices[8].SwitchBinary.Set(255);
                 zway.devices[9].SwitchBinary.Set(255);
                 zway.devices[10].SwitchMultilevel.Set(60);
                 zway.devices[11].SwitchMultilevel.Set(60);
 		     break;
-             case 3:
-                  zway.devices[10].SwitchMultilevel.Set(100);
-                  zway.devices[11].SwitchMultilevel.Set(60);
+             
+			 //Leviton Scene Controller 2nd Left
+			 case 3:
+                zway.devices[10].SwitchMultilevel.Set(100);
+                zway.devices[11].SwitchMultilevel.Set(60);
              break;
-		     case 5:
+	     	 
+			 //Leviton Scene Controller 3rd Left
+			 case 4:
+            	zway.devices[9].SwitchBinary.Set(255);
+	     	 break;
+		     
+			 //Leviton Scene Controller 1st Right
+			 case 5:
 		        zway.devices[7].SwitchBinary.Set(0);
                 zway.devices[8].SwitchBinary.Set(0);
                 zway.devices[9].SwitchBinary.Set(0);
                 zway.devices[10].SwitchMultilevel.Set(0);
                 zway.devices[11].SwitchMultilevel.Set(0);
              break;
-             case 6:
+             
+			 //Leviton Scene Controller 2nd Right
+			 case 6:
                  setTimeout(function() {
                      zway.devices[10].SwitchMultilevel.Set(0);
-                     zway.devices[11].SwitchMultilevel.Set(0);
+                     zway.devices[11].SwitchMultilevel.Set(0); 
                  }, 2*60*1000);
-
+		     break;
+			 
+			 //Leviton Scene Controller 3rd Right
+		     case 7:
+                zway.devices[9].SwitchBinary.Set(0); // Under Cabinet Lights
              break;
 	      }
       }
