@@ -129,6 +129,9 @@ zway.devices[13].instances[0].SceneActivation.data.currentScene.bind(function() 
 		  console.log("Handling scene change to " + sceneCurrentActive);
 	      switch(sceneCurrentActive) {
 			  
+			 case 1:
+			 break;
+			 
 			 //Leviton Scene Controller 1st Left
 			 case 2:
 		        zway.devices[7].SwitchBinary.Set(255);
@@ -148,9 +151,12 @@ zway.devices[13].instances[0].SceneActivation.data.currentScene.bind(function() 
 			 case 4:
             	zway.devices[9].SwitchBinary.Set(255);
 	     	 break;
+	     	 
+	     	         case 5:
+	     	         break;
 		     
 			 //Leviton Scene Controller 1st Right
-			 case 5:
+			 case 6:
 		        zway.devices[7].SwitchBinary.Set(0);
                 zway.devices[8].SwitchBinary.Set(0);
                 zway.devices[9].SwitchBinary.Set(0);
@@ -159,7 +165,7 @@ zway.devices[13].instances[0].SceneActivation.data.currentScene.bind(function() 
              break;
              
 			 //Leviton Scene Controller 2nd Right
-			 case 6:
+			 case 7:
                  setTimeout(function() {
                      zway.devices[10].SwitchMultilevel.Set(0);
                      zway.devices[11].SwitchMultilevel.Set(0); 
@@ -167,7 +173,7 @@ zway.devices[13].instances[0].SceneActivation.data.currentScene.bind(function() 
 		     break;
 			 
 			 //Leviton Scene Controller 3rd Right
-		     case 7:
+		     case 8:
                 zway.devices[9].SwitchBinary.Set(0); // Under Cabinet Lights
              break;
 	      }
